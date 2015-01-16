@@ -9,7 +9,6 @@
 #include <math.h>
 
 void ofApp::setup () {
-	savingPDF = false;
 
 	// Set the sides and the radius
 	nSides = 5;
@@ -48,10 +47,6 @@ void ofApp::setup () {
 
 void ofApp::update () {
 
-	if(savingPDF) {
-		ofBeginSaveScreenAsPDF("screenshot-" + ofGetTimestampString() + ".pdf", false);
-	}
-
 	// Get the vars from the gui
 	weight = weightCtrl;
 	fScale = fScaleCtrl;
@@ -76,22 +71,14 @@ void ofApp::draw () {
 	// Get the center and render sutcliffe fractal
 	ofVec2f center (ofGetWidth() / 2.0, ofGetHeight() / 2.0);
 	this->sutcliffe(basePolygon, center, depth);
-
-	if(savingPDF) {
-		ofEndSaveScreenAsPDF();
-		savingPDF = false;
-	}
 }
 
 void ofApp::keyPressed(int key) {
 	if(key == 'h') {
 		hGui = !hGui;
 	}
-
-	if(key == 'p') {
-		if(!savingPDF) {
-			savingPDF = true;
-		}
+	if(key == 's') {
+		ofSaveFrame();
 	}
 }
 

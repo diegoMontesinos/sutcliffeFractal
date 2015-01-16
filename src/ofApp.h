@@ -54,7 +54,5 @@ class ofApp : public ofBaseApp{
 		ofxToggle constantLW;
 		ofxToggle invertColors;
 
-		bool savingPDF;
-
 		bool hGui;
 };

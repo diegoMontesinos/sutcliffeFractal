@@ -3,6 +3,8 @@
  *
  * Diego Montesinos (diegoa.montesinos at gmail.com)
  * January, 2015
+ *
+ * Modificación para pintarlo con ofVboMesh por xumo
  */
 
 #include "ofApp.h"
@@ -43,11 +45,33 @@ void ofApp::setup () {
 
 	gui.add(constantLW.setup("Constant lineWidth", true));
 	gui.add(invertColors.setup("Invert colors", false));
+    //Pone el Mesh en modo de pintar lineas.
+    mesh.setMode(OF_PRIMITIVE_LINES);
+    /*
+     Estos son los tipos de pintado que se pueden
+     OF_PRIMITIVE_TRIANGLES,
+     OF_PRIMITIVE_TRIANGLE_STRIP,
+     OF_PRIMITIVE_TRIANGLE_FAN,
+     OF_PRIMITIVE_LINES,
+     OF_PRIMITIVE_LINE_STRIP,
+     OF_PRIMITIVE_LINE_LOOP,
+     OF_PRIMITIVE_POINTS
+     */
+   
 }
 
 void ofApp::update () {
 
 	// Get the vars from the gui
+    
+    if(weight != weightCtrl ||  fScale != fScaleCtrl || depth != depthCtrl)
+    {
+        //regenerar la malla si cambia algún parámetro
+        generateBasePolygon();
+    }
+    
+    
+    
 	weight = weightCtrl;
 	fScale = fScaleCtrl;
 	depth = depthCtrl;
@@ -69,8 +93,12 @@ void ofApp::draw () {
 	}
 
 	// Get the center and render sutcliffe fractal
-	ofVec2f center (ofGetWidth() / 2.0, ofGetHeight() / 2.0);
-	this->sutcliffe(basePolygon, center, depth);
+	
+	//sutcliffe(basePolygon, center, depth);
+    //Pintar malla en wireframe paraq ue se vean la lineas
+    mesh.drawWireframe();
+    
+    
 }
 
 void ofApp::keyPressed(int key) {
@@ -115,6 +143,11 @@ void ofApp::generateBasePolygon () {
 		// Increase the angle
 		angle += angleAmt;
 	}
+    //BOrrar el contenido la malla
+    mesh.clear();
+    //Mandar a rehacer la mall
+    ofVec2f center (ofGetWidth() / 2.0, ofGetHeight() / 2.0);
+    sutcliffe(basePolygon, center, depth);
 }
 
 void ofApp::sutcliffe (std::vector<ofVec2f> polygon, ofVec2f center, int n) {
@@ -133,8 +166,11 @@ void ofApp::sutcliffe (std::vector<ofVec2f> polygon, ofVec2f center, int n) {
 	for (int i = 0; i < pSize; i++) {
 		ofVec2f point = polygon[i];
 		ofVec2f nextPoint = polygon[(i + 1) % pSize];
-
-		ofLine(point.x, point.y, nextPoint.x, nextPoint.y);
+        //añadir dos vertices a la malla, el inicio y el final de la linea.
+        //A la hora de pintar hace lo mismo pero en el GPU. OF_PRIMITIVE_LINES pinta ina linea entre vertices adjacentes, de par en par.
+        mesh.addVertex(ofVec3f(point.x, point.y));
+        mesh.addVertex(ofVec3f(nextPoint.x, nextPoint.y));
+		//ofLine(point.x, point.y, nextPoint.x, nextPoint.y);
 	}
 
 	// If there are more steps

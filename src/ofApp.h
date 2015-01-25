@@ -53,6 +53,8 @@ class ofApp : public ofBaseApp{
 
 		ofxToggle constantLW;
 		ofxToggle invertColors;
-
+        //El mesh guarda vertices
+        ofVboMesh mesh;
+    
 		bool hGui;
 };
